@@ -1,3 +1,21 @@
+      - name: Install Lovable CLI
+        run: npm install -g lovable || true
+
+      - name: Deploy using Lovable CLI
+        env:
+          LOVABLE_TOKEN: ${{ secrets.LOVABLE_TOKEN }}
+          LOVABLE_PROJECT_ID: ${{ secrets.LOVABLE_PROJECT_ID }}
+        run: |
+          if command -v lovable >/dev/null 2>&1; then
+            if [ -n "${LOVABLE_PROJECT_ID:-}" ]; then
+              lovable deploy --token "$LOVABLE_TOKEN" --project "$LOVABLE_PROJECT_ID" --dir dist
+            else
+              lovable deploy --token "$LOVABLE_TOKEN" --dir dist
+            fi
+          else
+            echo "Lovable CLI not found after install step."
+            exit 1
+          fi
 name: Build and Deploy to Lovable
 
 on:
