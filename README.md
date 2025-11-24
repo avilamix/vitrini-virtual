@@ -43,3 +43,24 @@ Para iniciar o servidor de desenvolvimento dentro do container execute:
 ```bash
 npm run dev
 ```
+
+## Deploy (Lovable)
+
+Instruções gerais para publicar este app no Lovable. Se o painel do Lovable oferecer integração direta com o GitHub, o fluxo é simples:
+
+1. No painel do Lovable, crie um novo projeto e conecte seu repositório `avilamix/vitrini-virtual` (ou autorize acesso via GitHub).
+2. Configure as variáveis de ambiente no Lovable (em Settings > Environment):
+   - `GEMINI_API_KEY` (server-side)
+   - opcionalmente `VITE_GEMINI_API_KEY` (somente se precisar no cliente; atenção à segurança)
+3. Defina o comando de build:
+   - Build command: `npm ci && npm run build`
+4. Defina o diretório de publicação / output:
+   - Publish directory: `dist`
+5. Escolha a versão do Node (se solicitado): Node 18 é compatível.
+6. Inicie o deploy. O Lovable irá executar o build e publicar os arquivos estáticos.
+
+Observações:
+- Se quiser deploy automático via GitHub Actions, eu posso criar um workflow que aciona o deploy no push para `main`, mas precisarei de um token/API do Lovable com permissões de deploy.
+- Se o Lovable usa um CLI (ex.: `lovable deploy`), podemos usar um Action que instala o CLI e roda o deploy.
+
+Se preferir, me diga o link do painel Lovable (ou se o serviço tiver outro nome/URL) e eu adapto as instruções passo a passo ou crio o workflow de CI.
