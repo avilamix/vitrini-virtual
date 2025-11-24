@@ -38,14 +38,23 @@ jobs:
           name: dist
           path: dist
 
-      - name: Deploy to Lovable (placeholder)
+      - name: Deploy to Lovable (token-based or GitHub integration)
         env:
           LOVABLE_TOKEN: ${{ secrets.LOVABLE_TOKEN }}
         run: |
-          if [ -x ".github/scripts/deploy-to-lovable.sh" ]; then
-            bash .github/scripts/deploy-to-lovable.sh
+          # If a LOVABLE_TOKEN secret is provided, run the token-based deploy script.
+          # Otherwise, assume you use Lovable's GitHub integration (connect repository in Lovable dashboard)
+          # which will trigger deployments on pushes to `main` and does not require a token here.
+          if [ -n "${LOVABLE_TOKEN:-}" ]; then
+            if [ -x ".github/scripts/deploy-to-lovable.sh" ]; then
+              bash .github/scripts/deploy-to-lovable.sh
+            else
+              echo "Deploy script exists but is not executable. Making it executable and running."
+              chmod +x .github/scripts/deploy-to-lovable.sh
+              bash .github/scripts/deploy-to-lovable.sh
+            fi
           else
-            echo "No deploy script found or not executable: .github/scripts/deploy-to-lovable.sh"
-            echo "Add your deploy command or make the script executable."
-            exit 1
+            echo "LOVABLE_TOKEN secret not set."
+            echo "If you have connected this GitHub repository to Lovable via the GitHub integration, pushes to 'main' will trigger deployment automatically." 
+            echo "See: https://docs.lovable.dev/integrations/github"
           fi
