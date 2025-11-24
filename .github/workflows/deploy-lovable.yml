@@ -20,7 +20,7 @@ name: Build and Deploy to Lovable
 
 on:
   push:
-    branches: [ main ]
+    branches: [ main, add/devcontainer ]
 
 jobs:
   build:
