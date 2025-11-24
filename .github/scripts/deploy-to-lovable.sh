@@ -31,12 +31,32 @@ echo "--- PLACEHOLDER: Run the actual Lovable deploy command here ---"
 echo "If Lovable provides a CLI, install it in the workflow and run, for example:"
 echo "  lovable deploy --token \"\$LOVABLE_TOKEN\" --project YOUR_PROJECT_ID --dir dist"
 echo "If Lovable provides an API, use curl similar to the commented example below (adapt URL/params):"
+echo "--- Deploy: attempting to use Lovable CLI if present ---"
 
+# If a LOVABLE_PROJECT_ID secret is set, use it in the deploy command
+PROJECT_ID="${LOVABLE_PROJECT_ID:-}"
+
+if command -v lovable >/dev/null 2>&1; then
+  echo "Found 'lovable' CLI in PATH — running CLI deploy..."
+  if [ -n "$PROJECT_ID" ]; then
+    lovable deploy --token "$LOVABLE_TOKEN" --project "$PROJECT_ID" --dir dist
+  else
+    lovable deploy --token "$LOVABLE_TOKEN" --dir dist
+  fi
+  echo "CLI deploy finished (check Lovable dashboard for status)."
+  exit 0
+fi
+
+echo "'lovable' CLI not found. Using HTTP upload template (replace URL with Lovable API endpoint)."
+
+echo "Uploading $ZIPFILE using LOVABLE_TOKEN (hidden)"
+
+# Example curl POST (COMMENTED). Replace with the official Lovable endpoint and parameters.
 # curl -X POST "https://api.lovable.dev/v1/deploy" \
 #   -H "Authorization: Bearer $LOVABLE_TOKEN" \
-#   -F "project=YOUR_PROJECT_ID" \
+#   -F "project=$PROJECT_ID" \
 #   -F "file=@$ZIPFILE"
 
-echo "Finished placeholder deploy step. Replace placeholders with the official Lovable command or API call."
+echo "Finished placeholder deploy step. Replace the curl example with the official Lovable API or install the Lovable CLI in the workflow and use it." 
 
 exit 0

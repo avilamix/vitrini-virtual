@@ -60,7 +60,32 @@ Instruções gerais para publicar este app no Lovable. Se o painel do Lovable of
 6. Inicie o deploy. O Lovable irá executar o build e publicar os arquivos estáticos.
 
 Observações:
-- Se quiser deploy automático via GitHub Actions, eu posso criar um workflow que aciona o deploy no push para `main`, mas precisarei de um token/API do Lovable com permissões de deploy.
-- Se o Lovable usa um CLI (ex.: `lovable deploy`), podemos usar um Action que instala o CLI e roda o deploy.
+
+### Como conectar o GitHub (passo-a-passo)
+
+1. Entre no painel do Lovable e vá para **Integrations → GitHub** (ou similar).
+2. Clique em **Connect repository** (ou **Authorize GitHub**). Conceda as permissões necessárias (repo:read, workflow access se solicitado).
+3. Selecione o repositório `avilamix/vitrini-virtual` e habilite deploys automáticos para a branch `main`.
+4. No painel do Lovable, configure as variáveis de ambiente relativas ao projeto (Settings → Environment):
+    - `GEMINI_API_KEY` (server-side)
+    - `VITE_GEMINI_API_KEY` (opcional, somente se necessário no cliente)
+5. Opcional: se preferir deploy via token/API em vez da integração GitHub, crie um token no Lovable (API keys) e adicione o secret `LOVABLE_TOKEN` no GitHub (Repository → Settings → Secrets → Actions).
+    - Se for necessário especificar o projeto ao chamar a API/CLI, adicione também `LOVABLE_PROJECT_ID` como secret.
+
+### Habilitar o deploy automático via GitHub Actions
+
+O repositório já contém um workflow (`.github/workflows/deploy-lovable.yml`) que:
+- faz build (`npm ci && npm run build`) quando há push em `main`;
+- armazena `dist` como artifact;
+- tenta executar o script token-based `.github/scripts/deploy-to-lovable.sh` se o secret `LOVABLE_TOKEN` estiver definido;
+- se `LOVABLE_TOKEN` não estiver definido, o workflow não falha — o deploy poderá ser tratado pela integração GitHub do Lovable.
+
+Para usar deploy token-based (ex.: CLI/API):
+1. Adicione os secrets no GitHub:
+    - `LOVABLE_TOKEN`: token de deploy da Lovable
+    - `LOVABLE_PROJECT_ID` (opcional): ID do projeto no Lovable
+2. Edite `.github/scripts/deploy-to-lovable.sh` para ajustar a URL/API ou comando CLI conforme a documentação do Lovable (o script já tenta usar `lovable deploy` se a CLI estiver instalada no runner).
+
+Se quiser, eu posso preencher o script automaticamente se você me fornecer o comando exato do Lovable (CLI) ou o endpoint da API.
 
 Se preferir, me diga o link do painel Lovable (ou se o serviço tiver outro nome/URL) e eu adapto as instruções passo a passo ou crio o workflow de CI.
